@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Room booking</title>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF0F3;--panel:#fff;--ink:#15212B;--mute:#5B6874;--line:#D8DEE4;--accent:#1D4ED8;--accent-ink:#fff;--bad:#B3261E;--badbg:#FDECEA;--ok:#17653A;--okbg:#E6F4EC;--bl:90%;--bs:60%;--bd:42%;--bt:20%;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171D;--panel:#18222A;--ink:#E8EDF1;--mute:#93A1AD;--line:#2B3842;--accent:#6D93FF;--accent-ink:#0B1220;--bad:#FF9C94;--badbg:#3A1F1D;--ok:#7FD3A2;--okbg:#17301F;--bl:24%;--bs:40%;--bd:62%;--bt:88%}}
+:root[data-theme="dark"]{--bg:#10171D;--panel:#18222A;--ink:#E8EDF1;--mute:#93A1AD;--line:#2B3842;--accent:#6D93FF;--accent-ink:#0B1220;--bad:#FF9C94;--badbg:#3A1F1D;--ok:#7FD3A2;--okbg:#17301F;--bl:24%;--bs:40%;--bd:62%;--bt:88%}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 40px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between;margin-bottom:18px}
+h1{margin:0;font-size:28px;letter-spacing:-.02em;line-height:1.1}
+.sub{color:var(--mute);margin:4px 0 0}
+.nav{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--mute)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.date{font-weight:600;min-width:170px;text-align:center}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.sched{overflow-x:auto}
+.cal{display:grid;grid-template-columns:52px repeat(4,minmax(130px,1fr));min-width:640px}
+.rhead{padding:10px 10px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:3}
+.rhead b{display:block}.rhead span{color:var(--mute);font-size:13px}
+.rhead i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:hsl(var(--h) var(--bs) var(--bd))}
+.times{position:relative}
+.times div{position:absolute;right:8px;font-size:12px;color:var(--mute);transform:translateY(-8px)}
+.col{position:relative;border-left:1px solid var(--line);cursor:cell}
+.col .row{position:absolute;left:0;right:0;border-top:1px solid var(--line);opacity:.55;pointer-events:none}
+.col .row.h{opacity:1}
+.bk{position:absolute;left:4px;right:4px;border-radius:7px;padding:5px 8px;overflow:hidden;font-size:13px;line-height:1.3;cursor:pointer;
+background:hsl(var(--h) var(--bs) var(--bl));border-left:4px solid hsl(var(--h) var(--bs) var(--bd));color:hsl(var(--h) 30% var(--bt));z-index:2;text-align:left;border-top:0;border-right:0;border-bottom:0}
+.bk b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk span{opacity:.85}
+.bk.sel{outline:2px solid var(--accent)}
+.pick{position:absolute;left:4px;right:4px;border:2px dashed var(--accent);border-radius:7px;background:color-mix(in srgb,var(--accent) 14%,transparent);z-index:1;pointer-events:none}
+.now{position:absolute;left:0;right:0;border-top:2px solid var(--bad);z-index:4;pointer-events:none}
+.side{display:grid;gap:16px}
+.form{padding:16px}
+.form h2,.list h2{margin:0 0 12px;font-size:17px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+select,input[type=text]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.msg{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:14px}
+.msg.bad{background:var(--badbg);color:var(--bad)}.msg.ok{background:var(--okbg);color:var(--ok)}
+.msg button{all:unset;cursor:pointer;text-decoration:underline;font-weight:600}
+.actions{display:flex;gap:8px;margin-top:14px}.actions .primary{flex:1}
+.list{padding:16px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item small{color:var(--mute);display:block}
+.item .btn{padding:5px 9px;font-size:13px}
+.empty{color:var(--mute);margin:0}
+.stat{display:flex;gap:16px;color:var(--mute);font-size:14px;margin-top:8px}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.msg{animation:in .18s ease-out}@keyframes in{from{opacity:0;transform:translateY(-3px)}}}
+</style></head>
+<body><div class="wrap">
+<header>
+ <div><h1>Meeting rooms</h1><p class="sub" id="sum"></p></div>
+ <div class="nav">
+  <button class="btn" id="prev" aria-label="Previous day">&lsaquo;</button>
+  <div class="date" id="dlabel" aria-live="polite"></div>
+  <button class="btn" id="next" aria-label="Next day">&rsaquo;</button>
+  <button class="btn" id="today">Today</button>
+ </div>
+</header>
+<div class="layout">
+ <section class="panel sched" aria-label="Daily schedule"><div class="cal" id="cal"></div></section>
+ <aside class="side">
+  <div class="panel form">
+   <h2 id="ftitle">Book a room</h2>
+   <label for="room">Room</label><select id="room"></select>
+   <div class="two">
+    <div><label for="start">Start</label><select id="start"></select></div>
+    <div><label for="end">End</label><select id="end"></select></div>
+   </div>
+   <label for="title">Meeting title</label><input type="text" id="title" placeholder="Sprint planning">
+   <label for="who">Booked by</label><input type="text" id="who" placeholder="Your name">
+   <div id="msg" role="status"></div>
+   <div class="actions"><button class="btn primary" id="save">Reserve room</button><button class="btn" id="reset">Clear</button></div>
+  </div>
+  <div class="panel list"><h2>Bookings today</h2><div id="list"></div></div>
+ </aside>
+</div></div>
+<script>
+const ROOMS=[{id:'atlas',name:'Atlas',cap:10,h:222},{id:'birch',name:'Birch',cap:4,h:152},{id:'cedar',name:'Cedar',cap:14,h:28},{id:'delta',name:'Delta',cap:6,h:285}];
+const D0=8*60,D1=19*60,STEP=30,PX=26; // day window, slot size, pixels per slot
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const fmt=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+let day=new Date();day.setHours(0,0,0,0);
+let bookings=[],editing=null,pick=null;
+const KEY='room-bookings-v1';
+function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}return null}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(bookings))}catch(e){}}
+function seed(){const t=ymd(new Date());return[
+ {id:1,room:'atlas',date:t,start:540,end:600,title:'Team standup',who:'Priya'},
+ {id:2,room:'atlas',date:t,start:780,end:870,title:'Quarterly review',who:'Marcus'},
+ {id:3,room:'birch',date:t,start:600,end:660,title:'1:1 with Dana',who:'Sam'},
+ {id:4,room:'cedar',date:t,start:570,end:720,title:'Design workshop',who:'Lena'},
+ {id:5,room:'delta',date:t,start:900,end:960,title:'Vendor call',who:'Omar'}]}
+bookings=load()||seed();
+const opts=(el,from,to,sel)=>{el.innerHTML='';for(let m=from;m<=to;m+=STEP){const o=document.createElement('option');o.value=m;o.textContent=fmt(m);el.appendChild(o)}if(sel!=null)el.value=sel};
+$('room').innerHTML=ROOMS.map(r=>`<option value="${r.id}">${r.name} · seats ${r.cap}</option>`).join('');
+opts($('start'),D0,D1-STEP,600);opts($('end'),D0+STEP,D1,660);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const todays=()=>bookings.filter(b=>b.date===ymd(day));
+function clash(room,s,e,ignore){return bookings.find(b=>b.room===room&&b.date===ymd(day)&&b.id!==ignore&&s<b.end&&e>b.start)}
+function nextFree(room,len,from,ignore){for(let s=from;s+len<=D1;s+=STEP){if(!clash(room,s,s+len,ignore))return s}return null}
+function render(){
+ const rows=(D1-D0)/STEP,H=rows*PX;
+ $('dlabel').textContent=day.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+ let h='<div></div>'+ROOMS.map(r=>`<div class="rhead"><b><i style="--h:${r.h}"></i>${r.name}</b><span>Seats ${r.cap}</span></div>`).join('');
+ h+=`<div class="times" style="height:${H}px">`+Array.from({length:(D1-D0)/60+1},(_,i)=>`<div style="top:${i*2*PX}px">${fmt(D0+i*60)}</div>`).join('')+'</div>';
+ ROOMS.forEach(r=>{
+  h+=`<div class="col" data-room="${r.id}" style="height:${H}px;--h:${r.h}">`;
+  for(let i=0;i<rows;i++)h+=`<div class="row${i%2==0?' h':''}" style="top:${i*PX}px"></div>`;
+  todays().filter(b=>b.room===r.id).forEach(b=>{
+   const top=(b.start-D0)/STEP*PX,ht=(b.end-b.start)/STEP*PX-2;
+   h+=`<button class="bk${editing===b.id?' sel':''}" data-id="${b.id}" style="top:${top+1}px;height:${ht}px" aria-label="${esc(b.title)}, ${r.name}, ${fmt(b.start)} to ${fmt(b.end)}"><b>${esc(b.title)}</b><span>${fmt(b.start)}–${fmt(b.end)} · ${esc(b.who)}</span></button>`});
+  if(pick&&pick.room===r.id&&pick.date===ymd(day))h+=`<div class="pick" style="top:${(pick.start-D0)/STEP*PX}px;height:${(pick.end-pick.start)/STEP*PX}px"></div>`;
+  const n=new Date(),nm=n.getHours()*60+n.getMinutes();
+  if(ymd(n)===ymd(day)&&nm>=D0&&nm<=D1)h+=`<div class="now" style="top:${(nm-D0)/STEP*PX}px"></div>`;
+  h+='</div>'});
+ $('cal').innerHTML=h;
+ const t=todays().sort((a,b)=>a.start-b.start);
+ const mins=t.reduce((a,b)=>a+b.end-b.start,0),cap=ROOMS.length*(D1-D0);
+ $('sum').textContent=`${t.length} booking${t.length==1?'':'s'} · ${Math.round(mins/cap*100)}% of room time reserved`;
+ $('list').innerHTML=t.length?t.map(b=>`<div class="item"><div><b>${esc(b.title)}</b><small>${ROOMS.find(r=>r.id===b.room).name} · ${fmt(b.start)}–${fmt(b.end)} · ${esc(b.who)}</small></div><button class="btn" data-del="${b.id}">Cancel</button></div>`).join(''):'<p class="empty">No bookings yet. Select a time on the schedule to reserve a room.</p>';
+}
+function msg(type,html){$('msg').innerHTML=html?`<div class="msg ${type}">${html}</div>`:''}
+function setForm(b){editing=b?b.id:null;$('ftitle').textContent=b?'Edit booking':'Book a room';$('save').textContent=b?'Save changes':'Reserve room';
+ if(b){$('room').value=b.room;$('start').value=b.start;$('end').value=b.end;$('title').value=b.title;$('who').value=b.who}else{$('title').value=''}msg()}
+function sync(){const s=+$('start').value,e=+$('end').value;pick={room:$('room').value,date:ymd(day),start:s,end:Math.max(e,s+STEP)};render()}
+$('cal').addEventListener('click',ev=>{
+ const bk=ev.target.closest('.bk');
+ if(bk){const b=bookings.find(x=>x.id==bk.dataset.id);setForm(b);pick=null;render();return}
+ const col=ev.target.closest('.col');if(!col)return;
+ const y=ev.clientY-col.getBoundingClientRect().top;
+ const s=Math.min(D1-STEP,D0+Math.floor(y/PX)*STEP),e=Math.min(D1,s+60);
+ editing=null;setForm(null);
+ $('room').value=col.dataset.room;$('start').value=s;opts($('end'),s+STEP,D1,e);$('end').value=e;
+ sync();$('title').focus({preventScroll:true})});
+$('start').onchange=()=>{const s=+$('start').value,e=+$('end').value;opts($('end'),s+STEP,D1,e>s?e:Math.min(D1,s+60));sync()};
+$('end').onchange=sync;$('room').onchange=sync;
+$('save').onclick=()=>{
+ const room=$('room').value,s=+$('start').value,e=+$('end').value,title=$('title').value.trim(),who=$('who').value.trim();
+ if(!title||!who){msg('bad','Add a meeting title and your name to reserve the room.');return}
+ if(e<=s){msg('bad','End time must be after the start time.');return}
+ const c=clash(room,s,e,editing);
+ if(c){const rn=ROOMS.find(r=>r.id===room).name,nf=nextFree(room,e-s,s,editing);
+  msg('bad',`${rn} is already booked ${fmt(c.start)}–${fmt(c.end)} for “${esc(c.title)}”.`+(nf!=null?` Next free slot of this length: <button data-use="${nf}">${fmt(nf)}–${fmt(nf+e-s)}</button>`:' No free slot of this length remains today.'));return}
+ if(editing){Object.assign(bookings.find(b=>b.id===editing),{room,start:s,end:e,title,who});msg('ok','Booking updated.')}
+ else{bookings.push({id:Date.now(),room,date:ymd(day),start:s,end:e,title,who});msg('ok',`Reserved ${ROOMS.find(r=>r.id===room).name}, ${fmt(s)}–${fmt(e)}.`)}
+ save();editing=null;pick=null;$('title').value='';$('ftitle').textContent='Book a room';$('save').textContent='Reserve room';render()};
+$('msg').addEventListener('click',ev=>{const u=ev.target.dataset.use;if(u==null)return;const s=+u,len=+$('end').value-+$('start').value;
+ $('start').value=s;opts($('end'),s+STEP,D1,s+len);sync();msg()});
+$('reset').onclick=()=>{setForm(null);pick=null;render()};
+$('list').addEventListener('click',ev=>{const id=ev.target.dataset.del;if(!id)return;bookings=bookings.filter(b=>b.id!=id);save();if(editing==id)setForm(null);msg('ok','Booking cancelled.');render()});
+const go=n=>{day.setDate(day.getDate()+n);pick=null;editing=null;setForm(null);render()};
+$('prev').onclick=()=>go(-1);$('next').onclick=()=>go(1);
+$('today').onclick=()=>{day=new Date();day.setHours(0,0,0,0);pick=null;setForm(null);render()};
+render();
+</script></body></html>
